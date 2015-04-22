@@ -1,0 +1,25 @@
+
+# user info
+git config --global user.name "Your Name here"
+git config --global user.email "your_email@domainname.com"
+
+# clone repo
+git clone https:://github.com/leodido99/srdb_manager.git /d/gitrepo/srdb_manager
+
+# remote
+git remote add upstream https:://github.com/leodido99/srdb_manager.git
+
+# branches
+git branch (list branches)
+git branch <name> (new branch)
+git checkout <name> (change to branch)
+
+# add files
+git add .
+git add <file>
+
+# commit (to local repo)
+git commit -m 'msg'
+
+# push online
+git push <remote> <branch>

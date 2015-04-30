@@ -8,6 +8,10 @@ class TMTCDBMANAGERLIBSHARED_EXPORT TMTCDBManagerLib
 
 public:
     TMTCDBManagerLib();
+
+
+
+
 };
 
 #endif // TMTCDBMANAGERLIB_H

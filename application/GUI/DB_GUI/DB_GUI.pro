@@ -18,3 +18,14 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
+
+MYDLLDIR = $$IN_PWD/../../Lib/dll
+
+# As our header files are in the same directory, we can make Qt Creator find it
+# by specifying it as INCLUDEPATH.
+INCLUDEPATH += $$MYDLLDIR
+
+# Dependency to library domain (libdomain.so for Unices or domain.dll on Win32)
+# Repeat this for more libraries if needed.
+win32:LIBS += $$quote($$MYDLLDIR/TMTCDBManagerLib.dll)
+ unix:LIBS += $$quote(-L$$MYDLLDIR) -lTMTCDBManagerLib

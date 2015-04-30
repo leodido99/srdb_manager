@@ -1,1 +1,6 @@
 *~
+*.bak
+*build-*
+*.pro.user
+*~*.xlsx
+*~*.xls

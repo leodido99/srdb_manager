@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,17 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    sc2kdbmanager.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    sc2kdbmanager.h
 
 FORMS    += mainwindow.ui
+
+#LIBPATH = ../../lib/dlls
+
+#DEPENDPATH += $$LIBPATH
+#INCLUDEPATH += $$LIBPATH
+
+#LIBS += -L$$LIBPATH -lSC2KManager

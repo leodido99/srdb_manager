@@ -1,6 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDebug>
+
+#include "sc2kdbmanager.h"
+
+SC2KDBManager manager;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -10,5 +16,29 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    manager.close();
     delete ui;
+}
+
+void MainWindow::on_connectDB_clicked()
+{    
+    if (manager.connect("192.168.1.10","leo","Leon4Rdb","scos2000")) {
+        qDebug() << "DBG: Connected to database!";
+
+        /* Link database PCF table to table view */
+        ui->tblPCF->setModel(manager.getPCFModel());
+    } else {
+        qDebug() << "DBG: Could not connect to database!";
+    }
+}
+
+void MainWindow::on_newparam_clicked()
+{
+    scPCF parameter;
+    manager.newParameter(parameter);
+}
+
+void MainWindow::on_getparam_clicked()
+{
+    manager.getParameters();
 }

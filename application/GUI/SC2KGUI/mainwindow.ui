@@ -73,6 +73,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnNewPCFRec">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>10</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>New PCF Record</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

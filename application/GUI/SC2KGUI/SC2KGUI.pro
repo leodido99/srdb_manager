@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    sc2kdbmanager.cpp
+    sc2kdbmanager.cpp \
+    recorddialog.cpp
 
 HEADERS  += mainwindow.h \
-    sc2kdbmanager.h
+    sc2kdbmanager.h \
+    recorddialog.h
 
 FORMS    += mainwindow.ui
 

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #include "sc2kdbmanager.h"
+#include "recorddialog.h"
 
 SC2KDBManager manager;
 
@@ -47,4 +48,10 @@ void MainWindow::on_newparam_clicked()
 void MainWindow::on_getparam_clicked()
 {
     manager.getParameters();
+}
+
+void MainWindow::on_btnNewPCFRec_clicked()
+{
+    RecordDialog tst("PCF",manager.getSQLRecord(PCF));
+    tst.exec();
 }

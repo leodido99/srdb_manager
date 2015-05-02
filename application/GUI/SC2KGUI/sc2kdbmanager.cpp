@@ -97,6 +97,24 @@ void SC2KDBManager::setLogListView(QListWidget *log)
     this->log = log;
 }
 
+QSqlRecord SC2KDBManager::getSQLRecord(scTables table)
+{
+    QSqlTableModel *model;
+    switch(table) {
+        case PCF:
+            model = this->PCFModel;
+            break;
+        default:
+        qDebug() << "Unknown table";
+            break;
+    }
+    if (model != NULL) {
+        return model->record();
+    } else {
+        return *(new QSqlRecord);
+    }
+}
+
 QSqlTableModel* SC2KDBManager::getPCFModel()
 {
     return (this->PCFModel);

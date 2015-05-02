@@ -32,6 +32,10 @@ typedef struct{
     QString endian;
 }scPCF;
 
+typedef enum {
+    PCF
+}scTables;
+
 class SC2KDBManager
 {
     QSqlDatabase db;
@@ -63,6 +67,8 @@ public:
     void getParameters();
 
     void setLogListView(QListWidget *log);
+
+    QSqlRecord getSQLRecord(scTables table);
 
     /*!
      * \brief Get the PCF table model

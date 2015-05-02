@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    manager.setLogListView(ui->listLog);
 }
 
 MainWindow::~MainWindow()
@@ -35,6 +36,11 @@ void MainWindow::on_connectDB_clicked()
 void MainWindow::on_newparam_clicked()
 {
     scPCF parameter;
+    parameter.name = "magggu";
+    parameter.paramFormatCode = 1;
+    parameter.paramTypeCode = 1;
+    parameter.category = "C";
+    parameter.nature = "B";
     manager.newParameter(parameter);
 }
 

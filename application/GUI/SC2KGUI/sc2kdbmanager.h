@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QtSql>
+#include <QListWidget>
 
 typedef struct{
 
@@ -35,6 +36,7 @@ class SC2KDBManager
 {
     QSqlDatabase db;
     QSqlTableModel *PCFModel;
+    QListWidget *log;
 
 public:
     SC2KDBManager();
@@ -60,6 +62,13 @@ public:
 
     void getParameters();
 
+    void setLogListView(QListWidget *log);
+
+    /*!
+     * \brief Get the PCF table model
+     * Returns a QSqlTableModel of the PCF table to display content
+     * \return
+     */
     QSqlTableModel *getPCFModel();
 
     /*!
@@ -70,6 +79,7 @@ public:
 private:
     bool checkPCFMandatory(scPCF data);
     void init();
+    void writeLog(QString msg);
 };
 
 #endif // SC2KDBMANAGER_H

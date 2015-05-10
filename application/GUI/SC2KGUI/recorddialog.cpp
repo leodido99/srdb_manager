@@ -25,6 +25,9 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
         }
     }
 
+    /* Connect mapper signal to update function */
+    connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(updateRecord(QString)));
+
     QPushButton *createButton = new QPushButton(tr("Accept"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createRecord()));
 
@@ -85,18 +88,66 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
     setWindowTitle(tr("Config Dialog"));*/
 }
 
+void RecordDialog::setNbFieldsPerRow(int nbfield)
+{
+    if (nbfield > 0) {
+        this->nbFieldsPerRow = nbfield;
+    } else {
+        qDebug() << "Cannot set nb field per row to something equal to 0 or below";
+    }
+}
+
 void RecordDialog::createField(QSqlField field, QFormLayout *layout)
 {
     /* Create edit */
     QLineEdit *edit = new QLineEdit();
     edit->text() = field.value().toString();
-    /* Add edit to internal list */
-    this->lineEdits.append(edit);
+    /* Connect edit finished signal to mapper */
+    connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
+    /* Send field name on signal */
+    mapper.setMapping(edit, field.name());
     /* new row */
-    layout->addRow(field.name(), edit);
+    layout->addRow(field.name(), edit);    
 }
 
 void RecordDialog::createRecord()
 {
     qDebug() << "tst";
 }
+
+void RecordDialog::updateRecord(QString fieldname)
+{
+    bool updated = false;
+
+    /* We must find the value of the field */
+    QListIterator<QLabel*> iter(this->findChildren<QLabel*>());
+    /* Iterate through all children labels to find the correct one */
+    while(iter.hasNext()) {
+        QLabel* lbl = iter.next();
+        if (lbl->text() == fieldname) {
+            /* Update record */
+            QLineEdit *edit =(QLineEdit*)lbl->buddy();
+            this->record.value(fieldname).setValue(edit->text());
+            qDebug() << "Update " << lbl->text() << " to " << edit->text();
+            updated = true;
+        }
+    }
+
+    if (!updated) {
+        qDebug() << Q_FUNC_INFO << " Could not update record" << fieldname;
+    } else {
+        this->updateFields();
+    }
+}
+
+void RecordDialog::updateFields()
+{
+    QListIterator<QLabel*> iter(this->findChildren<QLabel*>());
+    while(iter.hasNext()) {
+        QLabel* lbl = iter.next();
+        QLineEdit *edit =(QLineEdit*)lbl->buddy();
+        edit->setText(this->record.value(lbl->text()).toString());
+        qDebug() << lbl->text() << this->record.value(lbl->text()).toString();
+    }
+}
+

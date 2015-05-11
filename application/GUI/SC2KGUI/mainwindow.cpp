@@ -3,10 +3,8 @@
 
 #include <QDebug>
 
-#include "sc2kdbmanager.h"
-#include "recorddialog.h"
 
-SC2KDBManager manager;
+#include "recorddialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

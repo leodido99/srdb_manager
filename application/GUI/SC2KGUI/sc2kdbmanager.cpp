@@ -3,24 +3,25 @@
 
 SC2KDBManager::SC2KDBManager()
 {
-
+    this->db = QSqlDatabase::addDatabase("QMYSQL");
 }
 
 bool SC2KDBManager::connect(QString host, QString userName, QString password, QString databaseName)
 {
-    bool result;
+    bool result;    
 
-    this->db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName(host);
-    db.setDatabaseName(databaseName);
-    db.setUserName(userName);
-    db.setPassword(password);
-    result = db.open();
+    this->db.setHostName(host);
+    this->db.setDatabaseName(databaseName);
+    this->db.setUserName(userName);
+    this->db.setPassword(password);
+    result = this->db.open();
     if (result) {
         this->init();
         /* Print tables */
         qDebug() << this->db.tables(QSql::Tables);
         this->writeLog(QString("Connected to database %1 on %2").arg(databaseName,host));
+    } else {
+        this->writeLog(QString("Could not connect to database %1 on %2 (%3)").arg(databaseName,host,this->db.lastError().text()));
     }
     return result;
 }

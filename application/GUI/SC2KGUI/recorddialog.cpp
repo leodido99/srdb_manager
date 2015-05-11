@@ -14,18 +14,9 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
     /* Contains n field */
     QVBoxLayout *fieldsLayout = new QVBoxLayout;
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addLayout(fieldsLayout);
-
-
-
-
-    /* Contains n vertical layouts */
-    QHBoxLayout *hboxAll = new QHBoxLayout;
-    QVBoxLayout *vboxLayout = new QVBoxLayout;
-    hboxAll->addLayout(vboxLayout);
-
-    QHBoxLayout *hboxLayout = new QHBoxLayout;
+    /* Contains n fiedlsLayout */
+    QHBoxLayout *colLayout = new QHBoxLayout;
+    colLayout->addLayout(fieldsLayout);
 
     /* Run through all record fields and create the GUI */
     for(int i=0; i < this->record.count(); i++) {
@@ -35,17 +26,10 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
         this->createField(this->record.field(i), field);
         fieldsLayout->addLayout(field);
 
-        qDebug() << this->record.field(i);
-
-        if ((i % this->nbFieldsPerRow) == 0 && i != 0) {            
+        if ((i % this->nbFieldsPerRow) == 0 && i != 0) {                     
             /* Add vertical layout and create a new one */
-            hboxLayout = new QHBoxLayout;
-            vboxLayout = new QVBoxLayout;
-            hboxLayout->addLayout(vboxLayout);
-            hboxAll->addLayout(vboxLayout);
-
-            //mainLayout->addLayout(formLayout);
-            //formLayout = new QFormLayout;
+            fieldsLayout = new QVBoxLayout;
+            colLayout->addLayout(fieldsLayout);
         }
     }
 
@@ -59,7 +43,7 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
     QVBoxLayout *frame = new QVBoxLayout;
-    frame->addLayout(mainLayout);
+    frame->addLayout(colLayout);
     frame->addWidget(createButton);
     frame->addWidget(closeButton);
 
@@ -163,7 +147,7 @@ void RecordDialog::createField(QSqlField field, QHBoxLayout *layout)
 
 void RecordDialog::createRecord()
 {
-    emit recordUpdated(this->record);
+    //emit recordUpdated(this->record);
 }
 
 void RecordDialog::updateRecord(QString fieldname)
@@ -179,7 +163,7 @@ void RecordDialog::updateRecord(QString fieldname)
             /* Update record */            
             QLineEdit *edit =(QLineEdit*)lbl->buddy();            
             qDebug() << "Update " << lbl->text() << " to " << edit->text() << " from " << this->record.value(fieldname);
-            qDebug() << "isValid" << this->record.value(fieldname).isValid();
+            //qDebug() << "isValid" << this->record.value(fieldname).isValid();
             this->record.setValue(fieldname, edit->text());
             updated = true;
         }

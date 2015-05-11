@@ -25,6 +25,8 @@ private slots:
     void on_btnNewPCFRec_clicked();
 
 
+    void on_connectDB_2_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

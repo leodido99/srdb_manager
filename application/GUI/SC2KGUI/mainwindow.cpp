@@ -55,3 +55,15 @@ void MainWindow::on_btnNewPCFRec_clicked()
     RecordDialog tst("PCF",manager.getSQLRecord(PCF));
     tst.exec();
 }
+
+void MainWindow::on_connectDB_2_clicked()
+{
+    if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2000")) {
+        qDebug() << "DBG: Connected to database!";
+
+        /* Link database PCF table to table view */
+        ui->tblPCF->setModel(manager.getPCFModel());
+    } else {
+        qDebug() << "DBG: Could not connect to database!";
+    }
+}

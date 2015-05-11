@@ -13,7 +13,7 @@ class RecordDialog : public QDialog
 {
     Q_OBJECT
     int nbFieldsPerRow;
-    QSqlRecord record;    
+    QSqlRecord record;
     QSignalMapper mapper;
 public:
     RecordDialog(QString wndName, QSqlRecord record);

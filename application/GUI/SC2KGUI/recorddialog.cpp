@@ -7,7 +7,7 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 {
     setWindowTitle(wndName);
 
-    this->record = record;
+    this->record = QSqlRecord(record);
     this->nbFieldsPerRow = DEFAULT_NB_FIELDS_PER_ROW;
 
     QFormLayout *formLayout = new QFormLayout;
@@ -15,17 +15,18 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 
     mainLayout->addLayout(formLayout);
 
+    /* Run through all record fields and create the GUI */
     for(int i=0; i < this->record.count(); i++) {
-        /*qDebug() << QString("Creating %1").arg(record.field(i).name());*/
         this->createField(this->record.field(i), formLayout);
-        if ((i % this->nbFieldsPerRow) == 0 && i != 0) {
+        qDebug() << this->record.field(i);
+        if ((i % this->nbFieldsPerRow) == 0 && i != 0) {            
             /* Number of fields per row */
             mainLayout->addLayout(formLayout);
             formLayout = new QFormLayout;
         }
     }
 
-    /* Connect mapper signal to update function */
+    /* Connect mapper signal to update function so that we can pass the field name */
     connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(updateRecord(QString)));
 
     QPushButton *createButton = new QPushButton(tr("Accept"));
@@ -72,9 +73,9 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(contentsWidget);
-   /* horizontalLayout->addWidget(pagesWidget, 1);*/
+    horizontalLayout->addWidget(pagesWidget, 1);
 
-  /*  QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    /*QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addStretch(1);
     buttonsLayout->addWidget(closeButton);
 
@@ -102,6 +103,7 @@ void RecordDialog::createField(QSqlField field, QFormLayout *layout)
     /* Create edit */
     QLineEdit *edit = new QLineEdit();
     edit->text() = field.value().toString();
+    edit->setMaxLength(field.length());
     /* Connect edit finished signal to mapper */
     connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
     /* Send field name on signal */
@@ -125,10 +127,11 @@ void RecordDialog::updateRecord(QString fieldname)
     while(iter.hasNext()) {
         QLabel* lbl = iter.next();
         if (lbl->text() == fieldname) {
-            /* Update record */
-            QLineEdit *edit =(QLineEdit*)lbl->buddy();
-            this->record.value(fieldname).setValue(edit->text());
-            qDebug() << "Update " << lbl->text() << " to " << edit->text();
+            /* Update record */            
+            QLineEdit *edit =(QLineEdit*)lbl->buddy();            
+            qDebug() << "Update " << lbl->text() << " to " << edit->text() << " from " << this->record.value(fieldname);
+            qDebug() << "isValid" << this->record.value(fieldname).isValid();
+            this->record.setValue(fieldname, edit->text());
             updated = true;
         }
     }
@@ -147,7 +150,7 @@ void RecordDialog::updateFields()
         QLabel* lbl = iter.next();
         QLineEdit *edit =(QLineEdit*)lbl->buddy();
         edit->setText(this->record.value(lbl->text()).toString());
-        qDebug() << lbl->text() << this->record.value(lbl->text()).toString();
+        /*qDebug() << lbl->text() << this->record.value(lbl->text()).toString();*/
     }
 }
 

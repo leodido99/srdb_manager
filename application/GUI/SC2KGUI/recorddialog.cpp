@@ -112,7 +112,7 @@ void RecordDialog::createField(QSqlField field, QHBoxLayout *layout)
     edit->text() = field.value().toString();
     edit->setMaxLength(field.length());
     /* Connect edit finished signal to mapper */
-    connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
+    //connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
     /* Send field name on signal */
     mapper.setMapping(edit, field.name());
     /* Create labels */

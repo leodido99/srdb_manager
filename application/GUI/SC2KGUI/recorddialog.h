@@ -20,19 +20,22 @@ public:
     void setNbFieldsPerRow(int nbfield);
 
 private:
-    void createField(QSqlField field, QFormLayout *layout);
+    //void createField(QSqlField field, QFormLayout *layout);
+    void createField(QSqlField field, QHBoxLayout *layout);
+    void updateFields();
 
 private slots:
     void createRecord();
 
     /*!
      * \brief Triggered when an edit field is finished being edited
-     * \param fieldname Then name of the field to update
+     * \param fieldname The name of the field to update
      * Links the edit field to the SQL record field
      */
     void updateRecord(QString fieldname);
 
-    void updateFields();
+signals:
+    void recordUpdated(QSqlRecord record);
 };
 
 #endif // RECORDDIALOG_H

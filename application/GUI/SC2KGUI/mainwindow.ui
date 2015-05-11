@@ -99,6 +99,19 @@
      <string>Connect Work</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>80</y>
+      <width>115</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>record test</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -106,7 +119,7 @@
      <x>0</x>
      <y>0</y>
      <width>897</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

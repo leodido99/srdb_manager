@@ -27,6 +27,8 @@ private slots:
 
     void on_connectDB_2_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

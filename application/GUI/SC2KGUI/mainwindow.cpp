@@ -54,6 +54,7 @@ void MainWindow::on_btnNewPCFRec_clicked()
 {
     RecordDialog tst("PCF",manager.getSQLRecord(PCF));
     tst.exec();
+    // Connect to signal updatedRecord to get back the update record
 }
 
 void MainWindow::on_connectDB_2_clicked()
@@ -66,4 +67,54 @@ void MainWindow::on_connectDB_2_clicked()
     } else {
         qDebug() << "DBG: Could not connect to database!";
     }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QSqlRecord record;
+    QSqlField field;
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    field.setName("test1");
+    field.setType(QVariant::String);
+    record.append(field);
+    field.setName("bonjour");
+    record.append(field);
+    field.setType(QVariant::String);
+    RecordDialog tst("PCF", record);
+    tst.exec();
 }

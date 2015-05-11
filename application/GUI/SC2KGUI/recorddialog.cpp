@@ -2,6 +2,7 @@
 #include <QSqlField>
 
 #define DEFAULT_NB_FIELDS_PER_ROW 10
+#define NB_WIDGETS_PER_ROW 4
 
 RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 {
@@ -10,19 +11,41 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
     this->record = QSqlRecord(record);
     this->nbFieldsPerRow = DEFAULT_NB_FIELDS_PER_ROW;
 
-    QFormLayout *formLayout = new QFormLayout;
-    QHBoxLayout *mainLayout = new QHBoxLayout;
+    /* Contains n field */
+    QVBoxLayout *fieldsLayout = new QVBoxLayout;
 
-    mainLayout->addLayout(formLayout);
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    mainLayout->addLayout(fieldsLayout);
+
+
+
+
+    /* Contains n vertical layouts */
+    QHBoxLayout *hboxAll = new QHBoxLayout;
+    QVBoxLayout *vboxLayout = new QVBoxLayout;
+    hboxAll->addLayout(vboxLayout);
+
+    QHBoxLayout *hboxLayout = new QHBoxLayout;
 
     /* Run through all record fields and create the GUI */
     for(int i=0; i < this->record.count(); i++) {
-        this->createField(this->record.field(i), formLayout);
+        /* Create new horizontal layout for the fields widgets */
+        QHBoxLayout *field = new QHBoxLayout;
+        /* Create widgets */
+        this->createField(this->record.field(i), field);
+        fieldsLayout->addLayout(field);
+
         qDebug() << this->record.field(i);
+
         if ((i % this->nbFieldsPerRow) == 0 && i != 0) {            
-            /* Number of fields per row */
-            mainLayout->addLayout(formLayout);
-            formLayout = new QFormLayout;
+            /* Add vertical layout and create a new one */
+            hboxLayout = new QHBoxLayout;
+            vboxLayout = new QVBoxLayout;
+            hboxLayout->addLayout(vboxLayout);
+            hboxAll->addLayout(vboxLayout);
+
+            //mainLayout->addLayout(formLayout);
+            //formLayout = new QFormLayout;
         }
     }
 
@@ -98,7 +121,7 @@ void RecordDialog::setNbFieldsPerRow(int nbfield)
     }
 }
 
-void RecordDialog::createField(QSqlField field, QFormLayout *layout)
+void RecordDialog::createField(QSqlField field, QHBoxLayout *layout)
 {
     /* Create edit */
     QLineEdit *edit = new QLineEdit();
@@ -108,13 +131,39 @@ void RecordDialog::createField(QSqlField field, QFormLayout *layout)
     connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
     /* Send field name on signal */
     mapper.setMapping(edit, field.name());
+    /* Create labels */
+    QLabel *lblName = new QLabel();
+    lblName->setBuddy(edit);
+    lblName->setText(field.name());
+    QLabel *lblType = new QLabel();
+    /* TODO */
+    QLabel *lblMandatory = new QLabel();
+    if (field.requiredStatus() == QSqlField::Required) {
+        lblMandatory->setText("*");
+    }
+    /* Add widgets to the grid layout */
+    layout->addWidget(lblName);
+    lblType->setText("test");
+    layout->addWidget(lblType);
+    lblMandatory->setText("*");
+    layout->addWidget(lblMandatory);
+    layout->addWidget(edit);
+    /*qDebug() << "row count " << layout->rowCount();
+    layout->addWidget(lblName, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW);
+    qDebug() << "row count " << layout->rowCount();
+    layout->addWidget(lblType, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+1);
+    qDebug() << "row count " << layout->rowCount();
+    layout->addWidget(lblMandatory, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+2);
+    qDebug() << "row count " << layout->rowCount();
+    layout->addWidget(edit, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+3);*/
+
     /* new row */
-    layout->addRow(field.name(), edit);    
+    //layout->addRow(field.name(), edit);
 }
 
 void RecordDialog::createRecord()
 {
-    qDebug() << "tst";
+    emit recordUpdated(this->record);
 }
 
 void RecordDialog::updateRecord(QString fieldname)

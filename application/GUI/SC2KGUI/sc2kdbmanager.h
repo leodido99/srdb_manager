@@ -55,6 +55,9 @@ public:
      */
     bool connect(QString host, QString userName, QString password, QString databaseName);
 
+    int getNbTables();
+
+
     /*!
      * \brief Create a new monitoring parameter (PCF)
      * \param data

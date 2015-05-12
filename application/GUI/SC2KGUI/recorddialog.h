@@ -15,6 +15,7 @@ class RecordDialog : public QDialog
     int nbFieldsPerRow;
     QSqlRecord record;
     QSignalMapper mapper;
+    QHash<QString,QLineEdit*> hash;
 public:
     RecordDialog(QString wndName, QSqlRecord record);
     void setNbFieldsPerRow(int nbfield);

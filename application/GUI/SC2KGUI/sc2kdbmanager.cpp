@@ -26,6 +26,11 @@ bool SC2KDBManager::connect(QString host, QString userName, QString password, QS
     return result;
 }
 
+int SC2KDBManager::getNbTables()
+{
+    this->db.tables(QSql::Tables).count();
+}
+
 bool SC2KDBManager::newParameter(scPCF data)
 {
     QSqlRecord record = this->PCFModel->record();

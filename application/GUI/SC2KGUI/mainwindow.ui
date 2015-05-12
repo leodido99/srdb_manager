@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>633</height>
+    <width>1154</width>
+    <height>830</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,21 +53,11 @@
      <string>get Parameters</string>
     </property>
    </widget>
-   <widget class="QTableView" name="tblPCF">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>60</y>
-      <width>681</width>
-      <height>411</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QListWidget" name="listLog">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>480</y>
+      <y>540</y>
       <width>691</width>
       <height>101</height>
      </rect>
@@ -102,8 +92,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>740</x>
-      <y>80</y>
+      <x>860</x>
+      <y>10</y>
       <width>115</width>
       <height>32</height>
      </rect>
@@ -112,14 +102,27 @@
      <string>record test</string>
     </property>
    </widget>
+   <widget class="QTabWidget" name="tabDBTables">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>1131</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>897</width>
-     <height>22</height>
+     <width>1154</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>

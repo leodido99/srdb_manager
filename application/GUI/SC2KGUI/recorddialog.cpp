@@ -3,6 +3,9 @@
 
 #define DEFAULT_NB_FIELDS_PER_ROW 10
 #define NB_WIDGETS_PER_ROW 4
+#define LBLNAME_FIXED_WIDTH 80
+#define LBLMANDA_FIXED_WIDTH 5
+#define LBLTYPE_FIXED_WIDTH 50
 
 RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 {
@@ -13,6 +16,7 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
 
     /* Contains n field */
     QVBoxLayout *fieldsLayout = new QVBoxLayout;
+    fieldsLayout->setAlignment(Qt::AlignTop);
 
     /* Contains n fiedlsLayout */
     QHBoxLayout *colLayout = new QHBoxLayout;
@@ -29,6 +33,7 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
         if ((i % this->nbFieldsPerRow) == 0 && i != 0) {                     
             /* Add vertical layout and create a new one */
             fieldsLayout = new QVBoxLayout;
+            fieldsLayout->setAlignment(Qt::AlignTop);
             colLayout->addLayout(fieldsLayout);
         }
     }
@@ -47,53 +52,9 @@ RecordDialog::RecordDialog(QString wndName, QSqlRecord record)
     frame->addWidget(createButton);
     frame->addWidget(closeButton);
 
-    setLayout(frame);
+    this->setLayout(frame);
 
-
-
-    /* Form Layout */
-
-
-    /*formLayout->addRow(tr("&Email:"), emailLineEdit);
-    formLayout->addRow(tr("&Age:"), ageSpinBox);
-    */
-
-
-    /*QListWidget *contentsWidget = new QListWidget;
-    contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(QSize(96, 84));
-    contentsWidget->setMovement(QListView::Static);
-    contentsWidget->setMaximumWidth(128);
-    contentsWidget->setSpacing(12);*/
-
-  /*  QStackedWidget *pagesWidget = new QStackedWidget;
-    pagesWidget->addWidget(new ConfigurationPage);
-    pagesWidget->addWidget(new UpdatePage);
-    pagesWidget->addWidget(new QueryPage);*/
-
-   // QPushButton *closeButton = new QPushButton(tr("Close"));
-
-    //createIcons();
-  /*  contentsWidget->setCurrentRow(0);
-
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
-
-    QHBoxLayout *horizontalLayout = new QHBoxLayout;
-    horizontalLayout->addWidget(contentsWidget);
-    horizontalLayout->addWidget(pagesWidget, 1);
-
-    /*QHBoxLayout *buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch(1);
-    buttonsLayout->addWidget(closeButton);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(horizontalLayout);
-    mainLayout->addStretch(1);
-    mainLayout->addSpacing(12);
-    mainLayout->addLayout(buttonsLayout);
-    setLayout(mainLayout);
-
-    setWindowTitle(tr("Config Dialog"));*/
+    this->updateFields();
 }
 
 void RecordDialog::setNbFieldsPerRow(int nbfield)
@@ -111,79 +72,76 @@ void RecordDialog::createField(QSqlField field, QHBoxLayout *layout)
     QLineEdit *edit = new QLineEdit();
     edit->text() = field.value().toString();
     edit->setMaxLength(field.length());
+    qDebug() << field.defaultValue() << field.isGenerated();
+    /* Add edit to hash map for value retrieval during update */
+    this->hash[field.name()] = edit;
     /* Connect edit finished signal to mapper */
-    //connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
+    connect(edit, SIGNAL(editingFinished()), &this->mapper, SLOT(map()));
     /* Send field name on signal */
     mapper.setMapping(edit, field.name());
     /* Create labels */
     QLabel *lblName = new QLabel();
     lblName->setBuddy(edit);
     lblName->setText(field.name());
+    lblName->setFixedWidth(LBLNAME_FIXED_WIDTH);
     QLabel *lblType = new QLabel();
-    /* TODO */
+    lblType->setFixedWidth(LBLTYPE_FIXED_WIDTH);
+    switch(field.type()) {
+        case QVariant::String:
+            lblType->setText(QString("Char(%1)").arg(field.length()));
+        break;
+        case QVariant::Int:
+            lblType->setText(QString("Int(%1)").arg(field.length()));
+            /* Set validator for line edit */
+            edit->setValidator(new QIntValidator);
+        break;
+        default:
+            qDebug() << "Unhandled type " << field.type();
+        break;
+    }
     QLabel *lblMandatory = new QLabel();
+    lblMandatory->setFixedWidth(LBLMANDA_FIXED_WIDTH);
     if (field.requiredStatus() == QSqlField::Required) {
         lblMandatory->setText("*");
     }
-    /* Add widgets to the grid layout */
-    layout->addWidget(lblName);
-    lblType->setText("test");
-    layout->addWidget(lblType);
-    lblMandatory->setText("*");
+    /* Add widgets to the layout */
+    layout->addWidget(lblName);    
+    layout->addWidget(lblType);    
     layout->addWidget(lblMandatory);
     layout->addWidget(edit);
-    /*qDebug() << "row count " << layout->rowCount();
-    layout->addWidget(lblName, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW);
-    qDebug() << "row count " << layout->rowCount();
-    layout->addWidget(lblType, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+1);
-    qDebug() << "row count " << layout->rowCount();
-    layout->addWidget(lblMandatory, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+2);
-    qDebug() << "row count " << layout->rowCount();
-    layout->addWidget(edit, layout->rowCount()-1, column*NB_WIDGETS_PER_ROW+3);*/
-
-    /* new row */
-    //layout->addRow(field.name(), edit);
 }
 
 void RecordDialog::createRecord()
 {
-    //emit recordUpdated(this->record);
+    emit recordUpdated(this->record);
 }
 
 void RecordDialog::updateRecord(QString fieldname)
-{
-    bool updated = false;
+{    
+    if (this->hash.contains(fieldname)) {
+        qDebug() << "Update " << fieldname << " to " << this->hash[fieldname]->text() << " from " << this->record.value(fieldname);
 
-    /* We must find the value of the field */
-    QListIterator<QLabel*> iter(this->findChildren<QLabel*>());
-    /* Iterate through all children labels to find the correct one */
-    while(iter.hasNext()) {
-        QLabel* lbl = iter.next();
-        if (lbl->text() == fieldname) {
-            /* Update record */            
-            QLineEdit *edit =(QLineEdit*)lbl->buddy();            
-            qDebug() << "Update " << lbl->text() << " to " << edit->text() << " from " << this->record.value(fieldname);
-            //qDebug() << "isValid" << this->record.value(fieldname).isValid();
-            this->record.setValue(fieldname, edit->text());
-            updated = true;
+        switch(this->record.value(fieldname).type()) {
+            case QVariant::String:
+                this->record.setValue(fieldname, this->hash[fieldname]->text());
+            break;
+            case QVariant::Int:
+                this->record.setValue(fieldname, this->hash[fieldname]->text().toInt());
+            break;
+            default:
+                qDebug() << Q_FUNC_INFO << "Unhandled type " << this->record.value(fieldname).type();
+            break;
         }
-    }
-
-    if (!updated) {
-        qDebug() << Q_FUNC_INFO << " Could not update record" << fieldname;
     } else {
-        this->updateFields();
+        qDebug() << Q_FUNC_INFO << "Field " << fieldname << " cannot be found in hash table";
     }
 }
 
 void RecordDialog::updateFields()
-{
-    QListIterator<QLabel*> iter(this->findChildren<QLabel*>());
-    while(iter.hasNext()) {
-        QLabel* lbl = iter.next();
-        QLineEdit *edit =(QLineEdit*)lbl->buddy();
-        edit->setText(this->record.value(lbl->text()).toString());
-        /*qDebug() << lbl->text() << this->record.value(lbl->text()).toString();*/
+{    
+    /* Update all edits with the record value */
+    for(int i=0; i < this->record.count(); i++) {
+        this->hash[this->record.field(i).name()]->setText(this->record.field(i).value().toString());
     }
 }
 

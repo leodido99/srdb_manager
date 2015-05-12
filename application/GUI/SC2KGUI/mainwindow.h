@@ -33,6 +33,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    void initTabs();
 };
 
 #endif // MAINWINDOW_H

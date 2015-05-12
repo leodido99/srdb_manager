@@ -66,14 +66,8 @@ void MainWindow::on_connectDB_2_clicked()
     if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2000")) {
         qDebug() << "DBG: Connected to database!";
 
-        /* For each tables create a new tab with a table view */
-        qDebug() <<  manager.getNbTables();
-        for(int i=0; i < manager.getNbTables(); i++) {
-            /* TODO Create function to get each table from SC2KDBManager */
-            QTableView *tbl = new QTableView();
-            tbl->setModel(manager.getPCFModel());
-            ui->tabDBTables->addTab(tbl, "Table");
-        }
+        this->initTabs();
+
 
         /* Link database PCF table to table view */
         //ui->tblPCF->setModel(manager.getPCFModel());
@@ -128,4 +122,27 @@ void MainWindow::on_pushButton_clicked()
     field.setType(QVariant::String);
     RecordDialog tst("PCF", record);
     tst.exec();
+}
+
+void MainWindow::initTabs()
+{
+    /* For each tables create a new tab with a table view */
+    qDebug() <<  manager.getNbTables();
+    for(int i=0; i < manager.getNbTables(); i++) {
+        QWidget *widget = new QWidget;
+        QVBoxLayout *layout = new QVBoxLayout;
+        QTableView *tbl = new QTableView();
+        /* Link the database table and table view */
+        tbl->setModel(manager.getPCFModel());
+        /* Add table to the layout */
+        layout->addWidget(tbl);
+        widget->setLayout(layout);
+        /* Add the layout to the tab */
+        ui->tabDBTables->addTab(widget, "Table");
+
+        /* TODO Create function to get each table from SC2KDBManager */
+
+
+
+    }
 }

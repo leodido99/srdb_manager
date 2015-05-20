@@ -39,8 +39,14 @@ typedef enum {
 class SC2KDBManager
 {
     QSqlDatabase db;
-    QSqlTableModel *PCFModel;
     QListWidget *log;
+    QList<QSqlTableModel *> tablesModel;
+    int currTableModel;
+
+
+
+    QSqlTableModel *PCFModel;
+
 
 public:
     SC2KDBManager();
@@ -57,6 +63,8 @@ public:
 
     int getNbTables();
 
+    QSqlTableModel *getNextTable();
+    QSqlTableModel *getFirsTable();
 
     /*!
      * \brief Create a new monitoring parameter (PCF)

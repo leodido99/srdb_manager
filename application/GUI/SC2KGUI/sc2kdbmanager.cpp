@@ -4,6 +4,7 @@
 SC2KDBManager::SC2KDBManager()
 {
     this->db = QSqlDatabase::addDatabase("QMYSQL");
+    this->currTableModel = 0;
 }
 
 bool SC2KDBManager::connect(QString host, QString userName, QString password, QString databaseName)
@@ -26,10 +27,78 @@ bool SC2KDBManager::connect(QString host, QString userName, QString password, QS
     return result;
 }
 
+void SC2KDBManager::init()
+{
+    QSqlTableModel *model;
+
+    /* Init the QSqlTablemodels for all tables */
+    QStringListIterator iter(this->db.tables(QSql::Tables));
+    while(iter.hasNext()) {
+        QString table = iter.next();
+        qDebug() << "Initializing table " << table;
+        model = new QSqlTableModel(NULL, this->db);
+        model->setTable(table);
+        if (!model->select()) {
+            this->writeLog(QString("Error during select of %1 : %2").arg(table, model->lastError().text()));
+        }
+        /* Add model to list */
+        this->tablesModel << model;
+    }
+}
+
 int SC2KDBManager::getNbTables()
 {
-    this->db.tables(QSql::Tables).count();
+    return this->tablesModel.count();
 }
+
+QSqlTableModel *SC2KDBManager::getNextTable()
+{
+    QSqlTableModel *ptr = NULL;
+    if (this->currTableModel < this->tablesModel.count()) {
+        ptr = this->tablesModel[this->currTableModel];
+        this->currTableModel++;
+    }
+    return ptr;
+}
+
+QSqlTableModel *SC2KDBManager::getFirsTable()
+{
+    QSqlTableModel *ptr = NULL;
+    this->currTableModel = 0;
+    if (this->tablesModel.count() > 0) {
+        ptr = this->tablesModel[this->currTableModel];
+        this->currTableModel++;
+    }
+    return ptr;
+}
+
+QSqlTableModel* SC2KDBManager::getPCFModel()
+{
+    return (this->PCFModel);
+}
+
+void SC2KDBManager::close()
+{
+    this->db.close();
+}
+
+void SC2KDBManager::setLogListView(QListWidget *log)
+{
+    this->log = log;
+}
+
+void SC2KDBManager::writeLog(QString msg)
+{
+    if (this->log != NULL) {
+        QListWidgetItem *newItem = new QListWidgetItem;
+        newItem->setText(msg);
+        this->log->addItem(newItem);
+    }
+}
+
+
+
+
 
 bool SC2KDBManager::newParameter(scPCF data)
 {
@@ -98,10 +167,7 @@ void SC2KDBManager::getParameters()
     }*/
 }
 
-void SC2KDBManager::setLogListView(QListWidget *log)
-{
-    this->log = log;
-}
+
 
 QSqlRecord SC2KDBManager::getSQLRecord(scTables table)
 {
@@ -121,15 +187,7 @@ QSqlRecord SC2KDBManager::getSQLRecord(scTables table)
     }
 }
 
-QSqlTableModel* SC2KDBManager::getPCFModel()
-{
-    return (this->PCFModel);
-}
 
-void SC2KDBManager::close()
-{
-    this->db.close();
-}
 
 bool SC2KDBManager::checkPCFMandatory(scPCF data)
 {
@@ -137,22 +195,9 @@ bool SC2KDBManager::checkPCFMandatory(scPCF data)
     return true;
 }
 
-void SC2KDBManager::init()
-{
-    this->PCFModel = new QSqlTableModel(NULL, this->db);
-    this->PCFModel->setTable("PCF");
-    if (!this->PCFModel->select()) {
-        qDebug() << "Error during select : " << this->PCFModel->lastError().text();
-    }
-    qDebug() << "PCFModel:" << this->PCFModel->rowCount();
-}
 
-void SC2KDBManager::writeLog(QString msg)
-{
-    QListWidgetItem *newItem = new QListWidgetItem;
-    newItem->setText(msg);
-    this->log->addItem(newItem);
-}
+
+
 
 /* Read from DB */
 /*

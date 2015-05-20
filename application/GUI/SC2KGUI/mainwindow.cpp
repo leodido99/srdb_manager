@@ -22,19 +22,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_connectDB_clicked()
 {    
-    if (manager.connect("192.168.1.10","leo","Leon4Rdb","scos2000")) {
-        qDebug() << "DBG: Connected to database!";
-
-        /* For each tables create a new tab with a table view */
-        qDebug() <<  manager.getNbTables();
-        for(int i=0; i < manager.getNbTables(); i++) {
-            ui->tabDBTables->addTab(new QWidget, "Table");
-        }
+    if (manager.connect("192.168.1.10","leo","Leon4Rdb","scos2000")) {        
+        this->initTabs();
 
         /* Link database PCF table to table view */
         //ui->tblPCF->setModel(manager.getPCFModel());
-    } else {
-        qDebug() << "DBG: Could not connect to database!";
     }
 }
 
@@ -64,19 +56,7 @@ void MainWindow::on_btnNewPCFRec_clicked()
 void MainWindow::on_connectDB_2_clicked()
 {
     if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2000")) {
-        qDebug() << "DBG: Connected to database!";
-
-        /* For each tables create a new tab with a table view */
-        qDebug() <<  manager.getNbTables();
-        for(int i=0; i < manager.getNbTables(); i++) {
-            /* TODO Create function to get each table from SC2KDBManager */
-            QTableView *tbl = new QTableView();
-            tbl->setModel(manager.getPCFModel());
-            ui->tabDBTables->addTab(tbl, "Table");
-        }
-
-        /* Link database PCF table to table view */
-        //ui->tblPCF->setModel(manager.getPCFModel());
+        this->initTabs();
     }
 }
 
@@ -128,4 +108,27 @@ void MainWindow::on_pushButton_clicked()
     field.setType(QVariant::String);
     RecordDialog tst("PCF", record);
     tst.exec();
+}
+
+void MainWindow::initTabs()
+{
+    /* For each tables create a new tab with a table view */   
+    QSqlTableModel *model = this->manager.getFirsTable();
+    while(model != NULL) {
+        QTableView *tbl = new QTableView();
+        tbl->setModel(model);
+        /* Add new tab */
+        ui->tabDBTables->addTab(tbl, model->tableName());
+
+        model = this->manager.getNextTable();
+    }
+
+
+    /*
+     *        for(int i=0; i < manager.getNbTables(); i++) {
+            QTableView *tbl = new QTableView();
+            tbl->setModel(manager.getPCFModel());
+            ui->tabDBTables->addTab(tbl, "Table");
+        }
+     */
 }

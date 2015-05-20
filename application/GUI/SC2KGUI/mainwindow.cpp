@@ -22,9 +22,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::initTabs()
 {
+    /* Remove all tabs */
+    this->deleteTabs();
     /* For each tables create a new tab with a table view and buttons */
     QSqlTableModel *model = this->manager.getFirsTable();
+    /* The tab Widget */
+    QTabWidget *tabWidget = ui->tabDBTables;
     while(model != NULL) {
+        /* Set model to update manually only */
+        model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         /* Create new page */
         QWidget *page = new QWidget();
         /* Create new base layout */
@@ -32,6 +38,8 @@ void MainWindow::initTabs()
         /* Create new Table View to hold the model */
         QTableView *tbl = new QTableView();
         tbl->setModel(model);
+        /* Add table view to hash */
+        this->hashTbl[model->tableName()] = tbl;
         /* Add table view to base layout */
         baseLayout->addWidget(tbl);
         /* Create new vertical layouts for buttons */
@@ -51,24 +59,73 @@ void MainWindow::initTabs()
         /* Connect button */
         connect(insertButton, SIGNAL(clicked()), &this->mapper, SLOT(map()));
         this->mapper.setMapping(insertButton, model->tableName());
+
+        /* Update Table */
+        QPushButton *updateButton = new QPushButton();
+        updateButton->setText("Send Update");
+        buttonLayout->addWidget(updateButton);
+        /* Connect button */
+        connect(updateButton, SIGNAL(clicked()), &this->mapper, SLOT(map()));
+        this->mapper.setMapping(updateButton, model->tableName());
+
+        /* Revert changes */
+        QPushButton *revertButton = new QPushButton();
+        revertButton->setText("Revert Changes");
+        buttonLayout->addWidget(revertButton);
+
         /* Add button layout to base layout */
         baseLayout->addLayout(buttonLayout);
         /* Add base layout to the page */
         page->setLayout(baseLayout);
         /* Add new tab */
-        ui->tabDBTables->addTab(page, model->tableName());
+        tabWidget->addTab(page, model->tableName());
         /* Get next table in the list */
         model = this->manager.getNextTable();
     }
 
-    /* Connect mapper and insert row function */
+    /* Connect mapper */
     connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(insertNewRow(QString)));
+    //connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(submitChanges(QString)));
+}
+
+void MainWindow::deleteTabs()
+{
+    qDebug() << "Deleting" << this->ui->tabDBTables->count() << " tabs";
+    for(unsigned int i=0; i < (unsigned int)this->ui->tabDBTables->count(); i++) {
+        ui->tabDBTables->widget(i)->close();
+        ui->tabDBTables->removeTab(i);
+    }
 }
 
 void MainWindow::insertNewRow(QString table)
 {
-    /* Find the table view model */
-    qDebug() << "Insert New Row " << table;
+    qDebug() << "Insert New Row" << table;
+
+    /* Insert row */
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(this->hashTbl[table]->model());
+    if (!model) {
+        return;
+    }
+    QModelIndex insertIndex = this->hashTbl[table]->currentIndex();
+    int row = insertIndex.row() == -1 ? 0 : insertIndex.row();
+    model->insertRow(row);
+    insertIndex = model->index(row, 0);
+    this->hashTbl[table]->setCurrentIndex(insertIndex);
+    this->hashTbl[table]->edit(insertIndex);
+}
+
+void MainWindow::submitChanges(QString table)
+{
+    /* Submit all changes */
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(this->hashTbl[table]->model());
+    if (!model) {
+        return;
+    }
+    if (model->submitAll()) {
+        qDebug() << "Changes submitted";
+    } else {
+        qDebug() << "Could not submit changes";
+    }
 }
 
 void MainWindow::on_connectDB_clicked()
@@ -158,14 +215,8 @@ void MainWindow::on_pushButton_clicked()
     tst.exec();
 }
 
-/*
- *     QSqlTableModel *model = qobject_cast<QSqlTableModel *>(table->model());
-    if (!model)
-        return;
-
-    QModelIndex insertIndex = table->currentIndex();
-    int row = insertIndex.row() == -1 ? 0 : insertIndex.row();
-    model->insertRow(row);
-    insertIndex = model->index(row, 0);
-    table->setCurrentIndex(insertIndex);
-    table->edit(insertIndex);*/
+void MainWindow::on_pushButton_2_clicked()
+{
+    this->manager.close();
+    this->deleteTabs();
+}

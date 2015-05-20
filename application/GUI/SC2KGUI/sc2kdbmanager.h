@@ -42,6 +42,7 @@ class SC2KDBManager
     QListWidget *log;
     QList<QSqlTableModel *> tablesModel;
     int currTableModel;
+    bool activeDB;
 
 
 

@@ -5,11 +5,17 @@ SC2KDBManager::SC2KDBManager()
 {
     this->db = QSqlDatabase::addDatabase("QMYSQL");
     this->currTableModel = 0;
+    this->activeDB = false;
 }
 
 bool SC2KDBManager::connect(QString host, QString userName, QString password, QString databaseName)
 {
-    bool result;    
+    bool result;
+
+    if (this->activeDB) {
+        this->writeLog(QString("Already connected to database %1 at %2").arg(this->db.databaseName(), this->db.hostName()));
+        return false;
+    }
 
     this->db.setHostName(host);
     this->db.setDatabaseName(databaseName);
@@ -18,6 +24,7 @@ bool SC2KDBManager::connect(QString host, QString userName, QString password, QS
     result = this->db.open();
     if (result) {
         this->init();
+        this->activeDB = true;
         /* Print tables */
         qDebug() << this->db.tables(QSql::Tables);
         this->writeLog(QString("Connected to database %1 on %2").arg(databaseName,host));
@@ -79,7 +86,10 @@ QSqlTableModel* SC2KDBManager::getPCFModel()
 
 void SC2KDBManager::close()
 {
+    this->writeLog(QString("Closing database %1 at %2").arg(this->db.databaseName(), this->db.hostName()));
     this->db.close();
+    this->activeDB = false;
+    this->tablesModel.clear();
 }
 
 void SC2KDBManager::setLogListView(QListWidget *log)

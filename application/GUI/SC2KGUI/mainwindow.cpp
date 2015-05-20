@@ -38,6 +38,9 @@ void MainWindow::initTabs()
         /* Create new Table View to hold the model */
         QTableView *tbl = new QTableView();
         tbl->setModel(model);
+        tbl->resizeColumnsToContents();
+        tbl->sortByColumn(0);
+        tbl->setSortingEnabled(true);
         /* Add table view to hash */
         this->hashTbl[model->tableName()] = tbl;
         /* Add table view to base layout */
@@ -57,21 +60,24 @@ void MainWindow::initTabs()
         insertButton->setText("Insert");
         buttonLayout->addWidget(insertButton);
         /* Connect button */
-        connect(insertButton, SIGNAL(clicked()), &this->mapper, SLOT(map()));
-        this->mapper.setMapping(insertButton, model->tableName());
+        connect(insertButton, SIGNAL(clicked()), &this->mapperInsert, SLOT(map()));
+        this->mapperInsert.setMapping(insertButton, model->tableName());
 
         /* Update Table */
         QPushButton *updateButton = new QPushButton();
         updateButton->setText("Send Update");
         buttonLayout->addWidget(updateButton);
         /* Connect button */
-        connect(updateButton, SIGNAL(clicked()), &this->mapper, SLOT(map()));
-        this->mapper.setMapping(updateButton, model->tableName());
+        connect(updateButton, SIGNAL(clicked()), &this->mapperUpdate, SLOT(map()));
+        this->mapperUpdate.setMapping(updateButton, model->tableName());
 
         /* Revert changes */
         QPushButton *revertButton = new QPushButton();
         revertButton->setText("Revert Changes");
         buttonLayout->addWidget(revertButton);
+        /* Connect button */
+        connect(revertButton, SIGNAL(clicked()), &this->mapperRevert, SLOT(map()));
+        this->mapperRevert.setMapping(revertButton, model->tableName());
 
         /* Add button layout to base layout */
         baseLayout->addLayout(buttonLayout);
@@ -84,8 +90,9 @@ void MainWindow::initTabs()
     }
 
     /* Connect mapper */
-    connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(insertNewRow(QString)));
-    //connect(&this->mapper, SIGNAL(mapped(QString)), this, SLOT(submitChanges(QString)));
+    connect(&this->mapperInsert, SIGNAL(mapped(QString)), this, SLOT(insertNewRow(QString)));
+    connect(&this->mapperUpdate, SIGNAL(mapped(QString)), this, SLOT(submitChanges(QString)));
+    connect(&this->mapperRevert, SIGNAL(mapped(QString)), this, SLOT(revertChanges(QString)));
 }
 
 void MainWindow::deleteTabs()
@@ -95,6 +102,13 @@ void MainWindow::deleteTabs()
         ui->tabDBTables->widget(i)->close();
         ui->tabDBTables->removeTab(i);
     }
+}
+
+void MainWindow::writeLog(QString msg)
+{
+    QListWidgetItem *newItem = new QListWidgetItem;
+    newItem->setText(msg);
+    ui->listLog->addItem(newItem);
 }
 
 void MainWindow::insertNewRow(QString table)
@@ -121,11 +135,22 @@ void MainWindow::submitChanges(QString table)
     if (!model) {
         return;
     }
-    if (model->submitAll()) {
-        qDebug() << "Changes submitted";
-    } else {
-        qDebug() << "Could not submit changes";
+    if (model->submitAll()) {        
+        this->writeLog(QString("Changes submitted"));
+    } else {        
+        this->writeLog(QString("Could not submit changes : %2 - %1").arg(model->lastError().databaseText(), model->lastError().driverText()));
     }
+}
+
+void MainWindow::revertChanges(QString table)
+{
+    /* Revert all changes */
+    QSqlTableModel *model = qobject_cast<QSqlTableModel *>(this->hashTbl[table]->model());
+    if (!model) {
+        return;
+    }
+    model->revertAll();
+    qDebug() << "Changes Reverted";
 }
 
 void MainWindow::on_connectDB_clicked()

@@ -13,7 +13,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     SC2KDBManager manager;
-    QSignalMapper mapper;
+    QSignalMapper mapperUpdate;
+    QSignalMapper mapperInsert;
+    QSignalMapper mapperRevert;
     QHash<QString,QTableView *> hashTbl;
 
 public:
@@ -35,6 +37,7 @@ private slots:
 
     void insertNewRow(QString table);
     void submitChanges(QString table);
+    void revertChanges(QString table);
 
     void on_pushButton_2_clicked();
 
@@ -42,6 +45,7 @@ private:
     Ui::MainWindow *ui;
     void initTabs();
     void deleteTabs();
+    void writeLog(QString msg);
 };
 
 #endif // MAINWINDOW_H

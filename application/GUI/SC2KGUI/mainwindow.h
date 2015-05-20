@@ -12,6 +12,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     SC2KDBManager manager;
+    QSignalMapper mapper;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -26,10 +27,11 @@ private slots:
 
     void on_btnNewPCFRec_clicked();
 
-
     void on_connectDB_2_clicked();
 
     void on_pushButton_clicked();
+
+    void insertNewRow(QString table);
 
 private:
     Ui::MainWindow *ui;

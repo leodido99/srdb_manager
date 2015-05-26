@@ -162,7 +162,7 @@ void MainWindow::on_connectDB_clicked()
 
 void MainWindow::on_connectDB_2_clicked()
 {
-    if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2000")) {
+    if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2k_import")) {
         this->initTabs();
     }
 }

@@ -11,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setupWidgets();
     manager.setLogListView(ui->listLog);
+
 }
 
 MainWindow::~MainWindow()
@@ -20,14 +22,35 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::initTabs()
+void MainWindow::setupWidgets()
+{
+    /* Editor */
+    QFrame *frame = new QFrame();
+    QHBoxLayout *frameLayout = new QHBoxLayout(frame);
+
+    /* Piece list */
+    puslist = new PUSlist;
+    puslist->addPiece("test1");
+    puslist->addPiece("test2");
+    frameLayout->addWidget(puslist);
+
+    /* Editor zone */
+    packetwidget = new PacketWidget();
+    frameLayout->addWidget(packetwidget);
+
+    ui->tabDBTables->addTab(frame, "Editor");
+
+    /* SCOS2k Tables */
+    sc2k = new QTabWidget;
+    ui->tabDBTables->addTab(sc2k, "SC2K Tables");
+}
+
+void MainWindow::initTabs(QTabWidget *tabWidget)
 {
     /* Remove all tabs */
-    this->deleteTabs();
+    this->deleteTabs(tabWidget);
     /* For each tables create a new tab with a table view and buttons */
     QSqlTableModel *model = this->manager.getFirsTable();
-    /* The tab Widget */
-    QTabWidget *tabWidget = ui->tabDBTables;
     while(model != NULL) {
         /* Set model to update manually only */
         model->setEditStrategy(QSqlTableModel::OnManualSubmit);
@@ -95,12 +118,12 @@ void MainWindow::initTabs()
     connect(&this->mapperRevert, SIGNAL(mapped(QString)), this, SLOT(revertChanges(QString)));
 }
 
-void MainWindow::deleteTabs()
+void MainWindow::deleteTabs(QTabWidget *tabWidget)
 {
-    qDebug() << "Deleting" << this->ui->tabDBTables->count() << " tabs";
-    for(unsigned int i=0; i < (unsigned int)this->ui->tabDBTables->count(); i++) {
-        ui->tabDBTables->widget(i)->close();
-        ui->tabDBTables->removeTab(i);
+    qDebug() << "Deleting" << tabWidget->count() << " tabs";
+    for(unsigned int i=0; i < (unsigned int)tabWidget->count(); i++) {
+        tabWidget->widget(i)->close();
+        tabWidget->removeTab(i);
     }
 }
 
@@ -155,15 +178,15 @@ void MainWindow::revertChanges(QString table)
 
 void MainWindow::on_connectDB_clicked()
 {    
-    if (manager.connect("192.168.1.10","leo","Leon4Rdb","scos2000")) {        
-        this->initTabs();
+    if (manager.connect("192.168.1.10","leo","Leon4Rdb","scos2000")) {                
+        this->initTabs(this->sc2k);
     }
 }
 
 void MainWindow::on_connectDB_2_clicked()
 {
-    if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2k_import")) {
-        this->initTabs();
+    if (manager.connect("10.54.36.56","leo","Leon4Rdb","scos2k_import")) {        
+        this->initTabs(this->sc2k);
     }
 }
 
@@ -243,5 +266,5 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     this->manager.close();
-    this->deleteTabs();
+    this->deleteTabs(this->sc2k);
 }

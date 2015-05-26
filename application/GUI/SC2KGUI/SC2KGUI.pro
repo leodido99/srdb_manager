@@ -15,11 +15,17 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     sc2kdbmanager.cpp \
-    recorddialog.cpp
+    recorddialog.cpp \
+    packetwidget.cpp \
+    puslist.cpp \
+    pusitem.cpp
 
 HEADERS  += mainwindow.h \
     sc2kdbmanager.h \
-    recorddialog.h
+    recorddialog.h \
+    packetwidget.h \
+    puslist.h \
+    pusitem.h
 
 FORMS    += mainwindow.ui
 

@@ -2,14 +2,19 @@
 #define PACKETWIDGET_H
 
 #include "pusitem.h"
+#include "packetitem.h"
 
 #include <QWidget>
 #include <QFrame>
+#include <QHBoxLayout>
 
 class PacketWidget : public QWidget
 {
     QFrame *packet;
+    QHBoxLayout *itemsLayout;
     bool isTC;
+
+    QList<PacketItem> packetItems;
 
 public:
     PacketWidget();
@@ -17,6 +22,8 @@ public:
 
     bool getIsTC() const;
     void setIsTC(bool value);
+    void addItem(PacketItem newItem);
+    void drawItems();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) Q_DECL_OVERRIDE;
@@ -25,6 +32,11 @@ protected:
     void dropEvent(QDropEvent *event) Q_DECL_OVERRIDE;
 
     void createNewPacket();
+    void clearItems();
+    void updateSize();
+
+
+
     void addPUSItem(PUSItem item);
 };
 

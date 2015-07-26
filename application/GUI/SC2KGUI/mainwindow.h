@@ -46,6 +46,8 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_buttonAdd_clicked();
+
 private:
     Ui::MainWindow *ui;    
     void initTabs(QTabWidget *tabWidget);

@@ -26,17 +26,30 @@ void MainWindow::setupWidgets()
 {
     /* Editor */
     QFrame *frame = new QFrame();
-    QHBoxLayout *frameLayout = new QHBoxLayout(frame);
+    QVBoxLayout *frameLayout = new QVBoxLayout(frame);
+    //QHBoxLayout *frameLayout = new QHBoxLayout(frame);
 
     /* Piece list */
-    puslist = new PUSlist;
+    /*puslist = new PUSlist;
     puslist->addPiece("test1");
     puslist->addPiece("test2");
-    frameLayout->addWidget(puslist);
+    frameLayout->addWidget(puslist);*/
+
+    /* Buttons */
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    QPushButton *buttonAdd = new QPushButton();
+    buttonAdd->setText("Add Parameter");
+    connect(buttonAdd, SIGNAL(clicked()), this, SLOT(on_buttonAdd_clicked()));
+    buttonLayout->addWidget(buttonAdd);
+    frameLayout->addLayout(buttonLayout);
 
     /* Editor zone */
     packetwidget = new PacketWidget();
     frameLayout->addWidget(packetwidget);
+    PacketItem header;
+    packetwidget->addItem(header);
+    //packetwidget->addItem(header);
+    packetwidget->drawItems();
 
     ui->tabDBTables->addTab(frame, "Editor");
 
@@ -267,4 +280,11 @@ void MainWindow::on_pushButton_2_clicked()
 {
     this->manager.close();
     this->deleteTabs(this->sc2k);
+}
+
+void MainWindow::on_buttonAdd_clicked()
+{
+    qDebug() << "add button clicked";
+    PacketItem header;
+    packetwidget->addItem(header);
 }

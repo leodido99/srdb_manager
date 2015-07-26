@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     recorddialog.cpp \
     packetwidget.cpp \
     puslist.cpp \
-    pusitem.cpp
+    pusitem.cpp \
+    packetitem.cpp
 
 HEADERS  += mainwindow.h \
     sc2kdbmanager.h \
     recorddialog.h \
     packetwidget.h \
     puslist.h \
-    pusitem.h
+    pusitem.h \
+    packetitem.h
 
 FORMS    += mainwindow.ui
 
